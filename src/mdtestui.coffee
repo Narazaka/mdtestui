@@ -9,14 +9,15 @@ MdTestUI.App.on 'start', ->
 
 class MdTestUI.Controller extends Marionette.Object
   index: ->
-    console.log 'index c'
-    view = new MdTestUI.View.IndexRoot()
-    MdTestUI.App.layout.getRegion('main').show(view)
-    view.render()
+    search = new Search()
+    tests = new Tests()
+    tests.add new Test(title: "aa")
+    search.on 'change:title', (model, value) ->
+    view = new MdTestUI.View.IndexRoot(search_model: search, tests_collection: tests)
+    MdTestUI.App.layout.main.show(view)
   test: (id) ->
-    console.log 'test c'
     view = new MdTestUI.View.TestRoot(id: id)
-    MdTestUI.App.layout.getRegion('main').show(view)
+    MdTestUI.App.layout.main.show(view)
 
 class MdTestUI.Router extends Marionette.AppRouter
   appRoutes:
@@ -34,7 +35,11 @@ class MdTestUI.View.IndexRoot extends Marionette.LayoutView
   template: "#index-root"
   regions:
     search: ".search"
+    tests: ".tests"
+  initialize: ({@search_model, @tests_collection}) ->
   onShow: ->
+    @search.show new MdTestUI.View.IndexSearch(model: @search_model)
+    @tests.show new MdTestUI.View.IndexTests(collection: @tests_collection)
 
 class MdTestUI.View.TestRoot extends Marionette.LayoutView
   template: "#test-root"
@@ -42,6 +47,31 @@ class MdTestUI.View.TestRoot extends Marionette.LayoutView
     search: ".search"
   initialize: ({id}) ->
     console.log id
+
+class MdTestUI.View.IndexSearch extends Marionette.ItemView
+  template: "#index-search"
+  bindings:
+    '.title':
+      observe: 'title'
+  onShow: ->
+    @stickit()
+
+class MdTestUI.View.IndexTest extends Marionette.ItemView
+  tagName: 'li'
+  template: "#index-test"
+
+class MdTestUI.View.IndexTests extends Marionette.CollectionView
+  tagName: 'ul'
+  childView: MdTestUI.View.IndexTest
+
+class Search extends Backbone.Model
+  defaults:
+    title: ''
+
+class Tests extends Backbone.Collection
+  model: -> Test
+
+class Test extends Backbone.Model
 
 $ ->
   MdTestUI.App.start()
