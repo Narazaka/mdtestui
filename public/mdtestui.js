@@ -36,7 +36,7 @@
       var view;
       console.log('test c');
       view = new MdTestUI.View.TestRoot({
-        test_id: id
+        id: id
       });
       return MdTestUI.App.layout.getRegion('main').show(view);
     };
@@ -113,9 +113,9 @@
     };
 
     TestRoot.prototype.initialize = function(arg) {
-      var test_id;
-      test_id = arg.test_id;
-      return console.log(test_id);
+      var id;
+      id = arg.id;
+      return console.log(id);
     };
 
     return TestRoot;

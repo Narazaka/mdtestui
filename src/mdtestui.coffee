@@ -15,7 +15,7 @@ class MdTestUI.Controller extends Marionette.Object
     view.render()
   test: (id) ->
     console.log 'test c'
-    view = new MdTestUI.View.TestRoot(test_id: id)
+    view = new MdTestUI.View.TestRoot(id: id)
     MdTestUI.App.layout.getRegion('main').show(view)
 
 class MdTestUI.Router extends Marionette.AppRouter
@@ -40,8 +40,8 @@ class MdTestUI.View.TestRoot extends Marionette.LayoutView
   template: "#test-root"
   regions:
     search: ".search"
-  initialize: ({test_id}) ->
-    console.log test_id
+  initialize: ({id}) ->
+    console.log id
 
 $ ->
   MdTestUI.App.start()
