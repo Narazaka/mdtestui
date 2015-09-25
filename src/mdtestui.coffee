@@ -1,13 +1,39 @@
 MdTestUI = {}
 
-# app
+# model
 
-MdTestUI.App = new Marionette.Application()
+class Test
+  constructor: (args) ->
+    @title = m.prop args.title || ''
+  @list: ->
+    m.request
+      method: 'GET'
+      url: '/tests'
 
-MdTestUI.App.on 'start', ->
-  @layout = new MdTestUI.View.Root()
-  @router = new MdTestUI.Router(controller: new MdTestUI.Controller())
-  Backbone.history.start(pushState: true)
+Component = {}
+
+Component.Index =
+  controller: ->
+    tests: Tests.list()
+  view: (ctl) -> [
+    m 'p', [
+      m 'button.new-test', 'New Test'
+    ]
+    m 'section.search'
+    m 'section.tests', [
+      m 'ul', ctl.tests.map (test) ->
+        m 'li', [
+          m 'span', test.title()
+        ]
+    ]
+  ]
+
+Component.Test =
+  view: (ctl) ->
+    m 'button.index', 'index'
+    m 'section.view'
+
+Tests = Array
 
 # controller
 
@@ -41,15 +67,6 @@ class MdTestUI.Controller extends Marionette.Object
     test.fetch()
     view = new MdTestUI.View.TestEditRoot(test_model: test)
     MdTestUI.App.layout.main.show(view)
-
-# router
-
-class MdTestUI.Router extends Marionette.AppRouter
-  appRoutes:
-    '': 'index'
-    'test': 'new_test'
-    'test/:id': 'test'
-    'test/:id/edit': 'edit_test'
 
 # view
 
@@ -170,19 +187,10 @@ class MdTestUI.View.IndexTests extends Marionette.CollectionView
   tagName: 'ul'
   childView: MdTestUI.View.IndexTest
 
-# model
+# router
 
-class Search extends Backbone.Model
-  defaults:
-    title: ''
-
-class Test extends Backbone.Model
-  urlRoot: '/tests'
-
-class Tests extends Backbone.Collection
-  model: Test
-  url: '/tests'
-
-$ ->
-  MdTestUI.App.start()
-  window.a = MdTestUI.App
+m.route document.body, '/',
+  '/': Index
+  '/test': NewTest
+  '/test/:id': Test
+  '/test/:id/edit': EditTest
